@@ -1,16 +1,19 @@
-name: Deploy Flutter Web to GitHub Pages
+name: Deploy Web
 
 on:
   push:
     branches:
-      - main  # Change this if your default branch is different
+      - main # Runs when changes are pushed to main
+
+env:
+  ENV_FILE: prod.env
 
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout repo
+      - name: Checkout Repository
         uses: actions/checkout@v4
 
       - name: Setup Flutter
@@ -19,14 +22,22 @@ jobs:
           flutter-version: 3.x
           channel: stable
 
-      - name: Install dependencies
+      - name: Create .env File
+        run: |
+          echo "BASE_URL=${{ vars.BASE_URL }}" > $ENV_FILE
+          echo "" >> $ENV_FILE
+          cat $ENV_FILE
+
+      - name: Install Dependencies
         run: flutter pub get
 
-      - name: Build web app
+      - name: Build Flutter Web App
         run: flutter build web --release --base-href "/neuroplan/"
 
       - name: Deploy to GitHub Pages
-        uses: peaceiris/actions-gh-pages@v3
+        uses: JamesIves/github-pages-deploy-action@v4
         with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: ./build/web
+          branch: gh-pages
+          folder: build/web
+          clean: true
+          token: ${{ secrets.GH_PAT }} # Default token should work
