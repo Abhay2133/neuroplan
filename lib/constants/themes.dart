@@ -64,7 +64,7 @@ class AppTheme {
     ),
 
     cardTheme: CardThemeData(
-      color: Colors.white,
+      color: Colors.grey[100],
       shadowColor: Colors.grey.withOpacity(0.5),
       elevation: 4,
       shape: RoundedRectangleBorder(

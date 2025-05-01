@@ -37,7 +37,7 @@ class _AppScreenState extends State<AppScreen> {
                 label: Text('Project'),
               ),
               NavigationRailDestination(
-                icon: Icon(Icons.history),
+                icon: Icon(Icons.history_outlined),
                 selectedIcon: Icon(Icons.history_sharp),
                 label: Text('History'),
               ),
