@@ -11,12 +11,13 @@ jobs:
 
     steps:
       - name: Checkout repo
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Setup Flutter
         uses: subosito/flutter-action@v2
         with:
-          flutter-version: 'stable'
+          flutter-version: 3.x
+          channel: stable
 
       - name: Install dependencies
         run: flutter pub get
