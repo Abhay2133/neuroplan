@@ -47,4 +47,4 @@ app.*.map.json
 .env
 prod.env
 .secrets
-.github/deployments/secrets.yml
+.github/workflows/secrets.yml
