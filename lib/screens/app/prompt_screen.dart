@@ -226,11 +226,12 @@ class _PromptScreenState extends State<PromptScreen> {
           padding: const EdgeInsets.symmetric(horizontal: 8.0),
           child: Row(
             children: [
-              Text(
-                data["goal"] ?? "Main Goal",
-                style: Theme.of(context).textTheme.headlineMedium,
+              Expanded(
+                child: Text(
+                  data["goal"] ?? "Main Goal",
+                  style: Theme.of(context).textTheme.headlineMedium,
+                ),
               ),
-              Expanded(child: SizedBox()),
               Text(
                 "${tasks.length} Task${tasks.length > 1 ? 's' : ''}",
                 style: Theme.of(context).textTheme.headlineSmall,

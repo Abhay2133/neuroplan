@@ -1,8 +1,16 @@
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/material.dart';
 
-class AuthService {
+class AuthService extends ChangeNotifier {
   final FirebaseAuth _auth = FirebaseAuth.instance;
 
+  AuthService() {
+    _auth.authStateChanges().listen((user) {
+      notifyListeners(); // Notify GoRouter when auth state changes
+    });
+  }
+
+  bool get isLoggedIn => currentUser != null;
   // Sign in with email and password
   Future<User?> signIn(String email, String password) async {
     try {
