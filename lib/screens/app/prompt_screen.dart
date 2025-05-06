@@ -64,6 +64,7 @@ class _PromptScreenState extends State<PromptScreen> {
 
     try {
       Map<String, dynamic> output = await aiFactory.generate(_controller.text);
+      if (generateId != id) return;
       setState(() {
         data = output;
       });
@@ -74,18 +75,17 @@ class _PromptScreenState extends State<PromptScreen> {
         isFailed = true;
       });
     } finally {
-      // Future.delayed(Duration(seconds: 1), () {
-      if (generateId != id) return;
       setState(() {
-        // data = true;
         isLoading = false;
-        // isFailed = id % 2 == 0;
       });
-      // });
     }
   }
 
-  void save() {}
+  Future<void> saveRecord(Prompt prompt) async {
+    
+  }
+
+  void saveAsProject() {}
 
   @override
   Widget build(BuildContext context) {
@@ -162,7 +162,7 @@ class _PromptScreenState extends State<PromptScreen> {
   Widget _saveBtn(BuildContext context) {
     return ElevatedButton(
       style: ElevatedButton.styleFrom(backgroundColor: AppColor.grey100),
-      onPressed: save,
+      onPressed: saveAsProject,
       child: Text(
         "Save as Project",
         style: TextStyle(color: Color(0xFF333333)),
@@ -285,4 +285,11 @@ class _PromptScreenState extends State<PromptScreen> {
       ),
     );
   }
+}
+
+class Prompt {
+  final String text;
+  final Map<String, dynamic> data;
+
+  const Prompt({required this.text, required this.data});
 }

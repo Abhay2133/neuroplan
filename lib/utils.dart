@@ -2,6 +2,25 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'dart:convert';
+import 'package:crypto/crypto.dart';
+
+
+String generateHash(String input) {
+  // Convert the input string to bytes
+  var bytes = utf8.encode(input);
+
+  // Generate the hash using SHA-256
+  var hash = sha256.convert(bytes);
+
+  // Return the first 16 characters of the hash
+  return hash.toString().substring(0, 16);
+}
+
+void main() {
+  String input = 'YourInputStringHere';
+  String hash = generateHash(input);
+  print('Generated Hash: $hash');
+}
 
 Map<String, dynamic> parseRoadmapToJson(String raw) {
   // Extract the JSON part from the raw string using RegExp
@@ -80,4 +99,26 @@ void alert(
       );
     },
   );
+}
+
+String timeElapsed(String utcDateTime) {
+  // Parse the UTC string to DateTime
+  DateTime dateTime = DateTime.parse(utcDateTime).toLocal();
+  DateTime now = DateTime.now();
+
+  Duration difference = now.difference(dateTime);
+
+  if (difference.inDays > 365) {
+    return '${(difference.inDays / 365).floor()} year(s) ago';
+  } else if (difference.inDays > 30) {
+    return '${(difference.inDays / 30).floor()} month(s) ago';
+  } else if (difference.inDays > 0) {
+    return '${difference.inDays} day(s) ago';
+  } else if (difference.inHours > 0) {
+    return '${difference.inHours} hour(s) ago';
+  } else if (difference.inMinutes > 0) {
+    return '${difference.inMinutes} minute(s) ago';
+  } else {
+    return '${difference.inSeconds} second(s) ago';
+  }
 }

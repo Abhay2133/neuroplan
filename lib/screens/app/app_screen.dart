@@ -1,11 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
+import 'package:go_router/go_router.dart';
 import 'package:neuroplan/services/auth_service.dart';
 import 'package:provider/provider.dart';
 
 class AppScreen extends StatefulWidget {
   final Widget child;
-  const AppScreen({super.key, required this.child});
+  final int index;
+  const AppScreen({super.key, required this.child, this.index = 0});
 
   @override
   State<AppScreen> createState() => _AppScreenState();
@@ -14,6 +16,14 @@ class AppScreen extends StatefulWidget {
 class _AppScreenState extends State<AppScreen> {
   int _selectedIndex = 0;
   final double sidePanelWidth = 200;
+
+  @override
+  void initState() {
+    super.initState();
+
+    _selectedIndex = widget.index;
+  }
+
   @override
   Widget build(BuildContext context) {
     final authService = Provider.of<AuthService>(context, listen: false);
@@ -38,12 +48,6 @@ class _AppScreenState extends State<AppScreen> {
         ],
       ),
     );
-  }
-
-  void onSelectItem(int index){
-    setState(() {
-      _selectedIndex = index;
-    });
   }
 
   Widget _logoutBtn(VoidCallback logout) {
@@ -75,19 +79,22 @@ class _AppScreenState extends State<AppScreen> {
         "text": "Prompt",
         "activeIcon": Icons.message_sharp,
         "inActiveIcon": Icons.message_outlined,
-        "isActive": _selectedIndex == 0,
+        "isActive": widget.index == 0,
+        "href": "/app/prompt",
       },
       {
         "text": "Projects",
         "inActiveIcon": Icons.book_outlined,
         "activeIcon": Icons.book_rounded,
-        "isActive": _selectedIndex == 1,
+        "isActive": widget.index == 1,
+        "href": "/app/projects",
       },
       {
         "text": "History",
         "activeIcon": Icons.lock_clock_sharp,
         "inActiveIcon": Icons.lock_clock_outlined,
-        "isActive": _selectedIndex == 2,
+        "isActive": widget.index == 2,
+        "href": "/app/history",
       },
     ];
     return SingleChildScrollView(
@@ -103,7 +110,10 @@ class _AppScreenState extends State<AppScreen> {
               activeIcon: items[index]["activeIcon"],
               text: items[index]["text"],
               isActive: items[index]["isActive"] ?? false,
-              onTap: (){onSelectItem(index);}
+              onTap: () {
+                // onSelectItem(index);
+                context.go(items[index]['href']);
+              },
             );
           },
           separatorBuilder: (context, index) => Gap(8),

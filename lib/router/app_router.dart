@@ -13,6 +13,7 @@ import 'package:provider/provider.dart';
 import 'package:neuroplan/services/auth_service.dart';
 
 class AppRouter {
+  static final List<String> AppScreens = ["prompt", "projects", "history"];
   static GoRouter createRouter(BuildContext context) {
     final authService = Provider.of<AuthService>(context, listen: false);
 
@@ -35,7 +36,12 @@ class AppRouter {
       },
       routes: [
         ShellRoute(
-          builder: (context, state, child) => AppScreen(child: child),
+          builder: (context, state, child) {
+            return AppScreen(
+              index: AppScreens.indexOf(state.matchedLocation.substring(5)),
+              child: child,
+            );
+          },
           routes: [
             GoRoute(
               path: '/app/prompt',

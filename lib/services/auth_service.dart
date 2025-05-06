@@ -5,6 +5,7 @@ class AuthService extends ChangeNotifier {
   final FirebaseAuth _auth = FirebaseAuth.instance;
 
   AuthService() {
+    FirebaseAuth.instance.setPersistence(Persistence.LOCAL);
     _auth.authStateChanges().listen((user) {
       notifyListeners(); // Notify GoRouter when auth state changes
     });
