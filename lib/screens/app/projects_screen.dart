@@ -7,7 +7,12 @@ class ProjectsScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       body: Center(
-        child: Text("Projects", style: Theme.of(context).textTheme.bodyLarge),
+        child: Scaffold(body: Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Column(children: [
+            Text("Projects", style: Theme.of(context).textTheme.headlineMedium,)
+          ],),
+        ),)
       ),
     );
   }

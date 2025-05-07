@@ -1,3 +1,5 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
 import 'package:neuroplan/constants/colors.dart';
@@ -19,11 +21,8 @@ class _PromptScreenState extends State<PromptScreen> {
   bool isLoading = false;
   bool isFailed = false;
   int generateId = 0;
-  final TextEditingController _controller = TextEditingController(
-    text:
-        "I want to launch a mobile app that helps people track their daily water intake, with features like reminders, progress charts, and gamification.",
-  );
-  dynamic data = promptResult;
+  final TextEditingController _controller = TextEditingController(text: "");
+  dynamic data;
   late AiFactory aiFactory;
 
   @override
@@ -63,14 +62,17 @@ class _PromptScreenState extends State<PromptScreen> {
     });
 
     try {
-      Map<String, dynamic> output = await aiFactory.generate(_controller.text);
+      String promptText = _controller.text;
+      Map<String, dynamic> output = await aiFactory.generate(promptText);
       if (generateId != id) return;
       setState(() {
         data = output;
       });
-      dlog(data);
+      await savePrompt(Prompt(text: promptText, data: output));
+      // dlog(data);
     } catch (e) {
-      alert(context, e.toString(), title: "Failed to load results");
+      if (mounted)
+        alert(context, e.toString(), title: "Failed to load results");
       setState(() {
         isFailed = true;
       });
@@ -81,8 +83,26 @@ class _PromptScreenState extends State<PromptScreen> {
     }
   }
 
-  Future<void> saveRecord(Prompt prompt) async {
-    
+  Future<void> savePrompt(Prompt prompt) async {
+    User? user = FirebaseAuth.instance.currentUser;
+
+    if (user == null) {
+      alert(context, "User not signed in", title: "ERROR");
+      return;
+    }
+
+    final uid = user.uid;
+
+    await FirebaseFirestore.instance
+        .collection('users')
+        .doc(uid)
+        .collection('prompts')
+        .doc(generateHash(prompt.text)) // Use hash as ID
+        .set({
+          'prompt': prompt.text,
+          'result': prompt.data,
+          'timestamp': FieldValue.serverTimestamp(),
+        }, SetOptions(merge: true)); // Optional: merge allows updates
   }
 
   void saveAsProject() {}
@@ -183,11 +203,11 @@ class _PromptScreenState extends State<PromptScreen> {
                   Spinner(radius: 6, strokeWidth: 3, color: Colors.white),
                 ]
                 : [
-                  data != null
-                      ? Icon(Icons.restart_alt)
-                      : Icon(Icons.arrow_forward),
+                  data != null ? Icon(Icons.restart_alt) : SizedBox(),
                   Gap(12),
                   Text(data != null ? "Regenerate" : "Generate"),
+                  Gap(12),
+                  data == null ? Icon(Icons.arrow_forward) : SizedBox(),
                 ],
       ),
     );

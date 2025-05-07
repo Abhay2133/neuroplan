@@ -2,11 +2,10 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
 class AuthService extends ChangeNotifier {
-  final FirebaseAuth _auth = FirebaseAuth.instance;
 
   AuthService() {
     FirebaseAuth.instance.setPersistence(Persistence.LOCAL);
-    _auth.authStateChanges().listen((user) {
+    FirebaseAuth.instance.authStateChanges().listen((user) {
       notifyListeners(); // Notify GoRouter when auth state changes
     });
   }
@@ -15,7 +14,7 @@ class AuthService extends ChangeNotifier {
   // Sign in with email and password
   Future<User?> signIn(String email, String password) async {
     try {
-      final userCredential = await _auth.signInWithEmailAndPassword(
+      final userCredential = await FirebaseAuth.instance.signInWithEmailAndPassword(
         email: email,
         password: password,
       );
@@ -29,7 +28,7 @@ class AuthService extends ChangeNotifier {
   // Register a new user with email and password
   Future<User?> signUp(String email, String password) async {
     try {
-      final userCredential = await _auth.createUserWithEmailAndPassword(
+      final userCredential = await FirebaseAuth.instance.createUserWithEmailAndPassword(
         email: email,
         password: password,
       );
@@ -51,9 +50,9 @@ class AuthService extends ChangeNotifier {
 
   // Sign out
   Future<void> signOut() async {
-    await _auth.signOut();
+    await FirebaseAuth.instance.signOut();
   }
 
   // Get current user
-  User? get currentUser => _auth.currentUser;
+  User? get currentUser => FirebaseAuth.instance.currentUser;
 }

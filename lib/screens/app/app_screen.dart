@@ -14,14 +14,12 @@ class AppScreen extends StatefulWidget {
 }
 
 class _AppScreenState extends State<AppScreen> {
-  int _selectedIndex = 0;
   final double sidePanelWidth = 200;
 
   @override
   void initState() {
     super.initState();
 
-    _selectedIndex = widget.index;
   }
 
   @override

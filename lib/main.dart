@@ -11,15 +11,13 @@ import 'package:provider/provider.dart';
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await dotenv.load(fileName: "prod.env");
-  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
+    // name: "web",
+  );
   runApp(
     MultiProvider(
-      providers: [
-        ChangeNotifierProvider(create: (_) => AuthService()),
-        // Add more providers here in future like:
-        // ChangeNotifierProvider(create: (_) => UserService()),
-        // Provider(create: (_) => ApiService()),
-      ],
+      providers: [ChangeNotifierProvider(create: (_) => AuthService())],
       child: const MainApp(),
     ),
   );
