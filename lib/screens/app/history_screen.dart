@@ -88,23 +88,16 @@ class _HistoryScreenState extends State<HistoryScreen> {
       itemCount: historyData.length,
       itemBuilder: (context, index) {
         return InkWell(
-          onTap: () {},
           borderRadius: BorderRadius.circular(8),
-          child: Container(
-            padding: EdgeInsets.all(12),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  historyData[index]['prompt'],
-                  style: Theme.of(context).textTheme.bodyLarge,
-                ),
-                Gap(4),
-                Text(
-                  timeAgoFromTimestamp(historyData[index]['timestamp']),
-                  style: Theme.of(context).textTheme.labelMedium,
-                ),
-              ],
+          onTap: (){},
+          child: ListTile(
+            title: Text(
+              historyData[index]["prompt"],
+              style: Theme.of(context).textTheme.bodyLarge,
+            ),
+            subtitle: Text(
+              timeAgoFromTimestamp(historyData[index]["timestamp"]),
+              style: Theme.of(context).textTheme.labelSmall,
             ),
           ),
         );

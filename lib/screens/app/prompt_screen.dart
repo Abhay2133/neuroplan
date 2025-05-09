@@ -2,10 +2,14 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
+import 'package:go_router/go_router.dart';
 import 'package:neuroplan/constants/colors.dart';
 import 'package:neuroplan/constants/env.dart';
 import 'package:neuroplan/constants/samples.dart';
 import 'package:neuroplan/services/ai/ai_factory.dart';
+import 'package:neuroplan/services/ai/base_ai.dart';
+import 'package:neuroplan/services/ai_provider_service.dart';
+import 'package:neuroplan/services/project_service.dart';
 import 'package:neuroplan/utils.dart';
 import 'package:neuroplan/widgets/skeleton.dart';
 import 'package:neuroplan/widgets/spinner.dart';
@@ -20,18 +24,62 @@ class PromptScreen extends StatefulWidget {
 class _PromptScreenState extends State<PromptScreen> {
   bool isLoading = false;
   bool isFailed = false;
+  bool isLoadingConfig = false;
   int generateId = 0;
-  final TextEditingController _controller = TextEditingController(text: "");
+  final TextEditingController _controller = TextEditingController(
+    text: promptResult["goal"],
+  );
   dynamic data;
   late AiFactory aiFactory;
 
   @override
   void initState() {
     super.initState();
-    aiFactory = AiFactory(
-      accessToken: ENV.accessToken,
-      aiProvider: ENV.aiProvider,
-    );
+
+    loadConfig();
+  }
+
+  void loadConfig() async {
+    AiProviderService aiProviderService = AiProviderService();
+    try {
+      setState(() {
+        isLoadingConfig = true;
+      });
+      String? selectedProvider = await aiProviderService.getSelectedProvider();
+      if (selectedProvider == null) return _proivderError();
+
+      String? apiKey = await aiProviderService.getApiKey(selectedProvider);
+      if (apiKey == null) return _proivderError();
+
+      setState(() {
+        aiFactory = AiFactory(
+          accessToken: apiKey,
+          aiProvider: selectedProvider,
+        );
+      });
+    } catch (e) {
+    } finally {
+      setState(() {
+        isLoadingConfig = false;
+      });
+    }
+  }
+
+  void _proivderError([
+    String error =
+        "Invalid access_token or provider, configure them in settings",
+  ]) {
+    if (mounted) {
+      alert(
+        copy: true,
+        context,
+        error,
+        title: "Invalid AI Provider",
+        onOk: () {
+          context.go("/app/settings");
+        },
+      );
+    }
   }
 
   @override
@@ -47,8 +95,11 @@ class _PromptScreenState extends State<PromptScreen> {
     });
   }
 
+  String lastPrompt = "";
+
   void onGenerate() async {
-    if (_controller.text.isEmpty) {
+    String prompt = _controller.text;
+    if (prompt.isEmpty) {
       ScaffoldMessenger.of(
         context,
       ).showSnackBar(SnackBar(content: Text("Give a prompt first")));
@@ -59,20 +110,24 @@ class _PromptScreenState extends State<PromptScreen> {
       isLoading = true;
       isFailed = false;
       generateId = id;
+      lastPrompt = prompt;
+      projectData = null;
     });
 
     try {
-      String promptText = _controller.text;
-      Map<String, dynamic> output = await aiFactory.generate(promptText);
+      Map<String, dynamic> output = await aiFactory.generate(prompt);
       if (generateId != id) return;
       setState(() {
         data = output;
       });
-      await savePrompt(Prompt(text: promptText, data: output));
+      await savePrompt(Prompt(text: prompt, data: output));
       // dlog(data);
+    } on InvalidApiKey catch (e) {
+      _proivderError(e.toString());
     } catch (e) {
-      if (mounted)
+      if (mounted) {
         alert(context, e.toString(), title: "Failed to load results");
+      }
       setState(() {
         isFailed = true;
       });
@@ -105,7 +160,46 @@ class _PromptScreenState extends State<PromptScreen> {
         }, SetOptions(merge: true)); // Optional: merge allows updates
   }
 
-  void saveAsProject() {}
+  bool isSaving = false;
+  dynamic projectData;
+  void saveAsProject() async {
+    String? projectName = await showTextInputDialog(
+      context: context,
+      title: "Project Name",
+    );
+    if (projectName == null) return;
+    String? uid = FirebaseAuth.instance.currentUser?.uid;
+    if (uid == null) {
+      alert(context, "User is not signed in !", title: "Error");
+      return;
+    }
+
+    setState(() {
+      isSaving = true;
+    });
+    ProjectService projectService = ProjectService(uid: uid);
+    try {
+      dynamic res = projectService.createProject({
+        "name": projectName,
+        "goal": data['goal'],
+        "tasks": data["tasks"],
+        "promptId": generateHash(lastPrompt),
+        'timestamp': FieldValue.serverTimestamp(),
+      });
+      setState(() {
+        projectData = res;
+      });
+    } catch (e) {
+      if (mounted) {
+        alert(context, e.toString(), title: "Project Save error", copy: true);
+      }
+      dlog(e);
+    } finally {
+      setState(() {
+        isSaving = false;
+      });
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -180,12 +274,20 @@ class _PromptScreenState extends State<PromptScreen> {
   }
 
   Widget _saveBtn(BuildContext context) {
-    return ElevatedButton(
-      style: ElevatedButton.styleFrom(backgroundColor: AppColor.grey100),
-      onPressed: saveAsProject,
-      child: Text(
-        "Save as Project",
-        style: TextStyle(color: Color(0xFF333333)),
+    return InkWell(
+      // style: ElevatedButton.styleFrom(backgroundColor: AppColor.grey100),
+      borderRadius: BorderRadius.circular(8),
+      onTap: projectData == null ? saveAsProject : null,
+      child: Container(
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(8),
+          border: Border.all(width: 1, color: AppColor.translucentDark),
+        ),
+        padding: EdgeInsets.symmetric(horizontal: 16, vertical: 6),
+        child: Text(
+          projectData == null ? "Save as Project" : "Project Saved",
+          style: Theme.of(context).textTheme.bodyMedium,
+        ),
       ),
     );
   }

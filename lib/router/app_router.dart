@@ -4,6 +4,7 @@ import 'package:neuroplan/screens/app/app_screen.dart';
 import 'package:neuroplan/screens/app/history_screen.dart';
 import 'package:neuroplan/screens/app/projects_screen.dart';
 import 'package:neuroplan/screens/app/prompt_screen.dart';
+import 'package:neuroplan/screens/app/settings_screen.dart';
 import 'package:neuroplan/screens/auth/login_screen.dart'
     deferred as lazy_login;
 import 'package:neuroplan/screens/auth/signup_screen.dart'
@@ -37,10 +38,7 @@ class AppRouter {
       routes: [
         ShellRoute(
           builder: (context, state, child) {
-            return AppScreen(
-              index: AppScreens.indexOf(state.matchedLocation.substring(5)),
-              child: child,
-            );
+            return AppScreen(href: state.matchedLocation, child: child);
           },
           routes: [
             GoRoute(
@@ -54,6 +52,10 @@ class AppRouter {
             GoRoute(
               path: '/app/history',
               builder: (context, state) => const HistoryScreen(),
+            ),
+            GoRoute(
+              path: '/app/settings',
+              builder: (context, state) => const SettingsScreen(),
             ),
           ],
         ),

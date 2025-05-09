@@ -1,7 +1,6 @@
 import 'dart:convert';
 
 import 'package:http/http.dart' as http;
-import 'package:neuroplan/constants/env.dart';
 import 'package:neuroplan/services/ai/base_ai.dart';
 import 'package:neuroplan/utils.dart';
 
@@ -17,7 +16,7 @@ class Groq extends BaseAi {
         url,
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': 'Bearer ${ENV.accessToken}', // if needed
+          'Authorization': 'Bearer $accessToken', // if needed
         },
         body: jsonEncode({
           "model": "llama3-70b-8192",
@@ -26,6 +25,10 @@ class Groq extends BaseAi {
           ],
         }),
       );
+
+      if (response.statusCode == 401) {
+        throw InvalidApiKey("INVALID GROQ API KEY");
+      }
 
       if (response.statusCode == 200) {
         final data = jsonDecode(response.body);

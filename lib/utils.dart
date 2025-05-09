@@ -58,6 +58,7 @@ void alert(
   String text, {
   bool copy = false,
   String title = "Alert",
+  VoidCallback? onOk,
 }) {
   showDialog(
     context: context,
@@ -74,7 +75,7 @@ void alert(
                     onPressed: () async {
                       Navigator.pop(context); // Close dialog
                       ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(content: Text("Copied to clipboard")),
+                        SnackBar(content: Text("Copied to clipboard"), behavior: SnackBarBehavior.floating, width: 400,),
                       );
                       await Clipboard.setData(ClipboardData(text: text));
                     },
@@ -87,6 +88,7 @@ void alert(
               TextButton(
                 onPressed: () {
                   Navigator.pop(context); // Close dialog
+                  if (onOk != null) onOk();
                 },
                 child: Text(
                   "OK",
@@ -146,4 +148,43 @@ String timeAgoFromTimestamp(Timestamp timestamp) {
     final years = (difference.inDays / 365).floor();
     return '$years year${years == 1 ? '' : 's'} ago';
   }
+}
+
+Future<String?> showTextInputDialog({
+  required BuildContext context,
+  required String title,
+  String hintText = '',
+  String submitLabel = 'Submit',
+  String cancelLabel = 'Cancel',
+}) async {
+  final TextEditingController controller = TextEditingController();
+
+  return showDialog<String>(
+    context: context,
+    builder: (context) {
+      return AlertDialog(
+        title: Text(title),
+        content: TextField(
+          controller: controller,
+          decoration: InputDecoration(hintText: hintText),
+          autofocus: true,
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context), // cancel
+            child: Text(cancelLabel),
+          ),
+          ElevatedButton(
+            onPressed: () {
+              final text = controller.text.trim();
+              if (text.isNotEmpty) {
+                Navigator.pop(context, text);
+              }
+            },
+            child: Text(submitLabel),
+          ),
+        ],
+      );
+    },
+  );
 }

@@ -16,4 +16,7 @@ class AppColor {
 
   static Color get translucentBG =>
       _themeColor(dark: Color(0x11ffffff), light: Color(0x11555555));
+
+  static Color get translucentDark =>
+      _themeColor(dark: Color(0x16ffffff), light: Color(0x22555555));
 }
