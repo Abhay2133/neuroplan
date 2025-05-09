@@ -30,7 +30,7 @@ class _PromptScreenState extends State<PromptScreen> {
     text: promptResult["goal"],
   );
   dynamic data;
-  late AiFactory aiFactory;
+  AiFactory? aiFactory;
 
   @override
   void initState() {
@@ -98,6 +98,10 @@ class _PromptScreenState extends State<PromptScreen> {
   String lastPrompt = "";
 
   void onGenerate() async {
+    if(aiFactory == null){
+      alert(context, title: "No AI Provider", "Configure the AI settings", onOk: (){context.go("/app/settings");});
+      return;
+    }
     String prompt = _controller.text;
     if (prompt.isEmpty) {
       ScaffoldMessenger.of(
@@ -115,7 +119,7 @@ class _PromptScreenState extends State<PromptScreen> {
     });
 
     try {
-      Map<String, dynamic> output = await aiFactory.generate(prompt);
+      Map<String, dynamic> output = await aiFactory!.generate(prompt);
       if (generateId != id) return;
       setState(() {
         data = output;
