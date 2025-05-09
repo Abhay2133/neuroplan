@@ -2,7 +2,6 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
 class AuthService extends ChangeNotifier {
-
   AuthService() {
     FirebaseAuth.instance.setPersistence(Persistence.LOCAL);
     FirebaseAuth.instance.authStateChanges().listen((user) {
@@ -14,10 +13,8 @@ class AuthService extends ChangeNotifier {
   // Sign in with email and password
   Future<User?> signIn(String email, String password) async {
     try {
-      final userCredential = await FirebaseAuth.instance.signInWithEmailAndPassword(
-        email: email,
-        password: password,
-      );
+      final userCredential = await FirebaseAuth.instance
+          .signInWithEmailAndPassword(email: email, password: password);
       return userCredential.user;
     } catch (e) {
       print('Login Error: $e');
@@ -28,10 +25,8 @@ class AuthService extends ChangeNotifier {
   // Register a new user with email and password
   Future<User?> signUp(String email, String password) async {
     try {
-      final userCredential = await FirebaseAuth.instance.createUserWithEmailAndPassword(
-        email: email,
-        password: password,
-      );
+      final userCredential = await FirebaseAuth.instance
+          .createUserWithEmailAndPassword(email: email, password: password);
       return userCredential.user;
     } catch (e) {
       String errorMessage = '';
@@ -40,8 +35,11 @@ class AuthService extends ChangeNotifier {
           errorMessage = 'The password is too weak.';
         } else if (e.code == 'email-already-in-use') {
           errorMessage = 'The account already exists for that email.';
+        } else if (e.code == "invalid-email") {
+          errorMessage = "Invalid Email address";
         } else {
-          errorMessage = e.message ?? 'An unknown error occurred. Please try again.';
+          errorMessage =
+              e.message ?? 'An unknown error occurred. Please try again.';
         }
       }
       throw Exception(errorMessage);
