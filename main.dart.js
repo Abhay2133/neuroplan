@@ -88185,6 +88185,7 @@ m=A.a0(g)
 l=""
 if(m instanceof A.tO)if(m.c==="weak-password")l="The password is too weak."
 else if(m.c==="email-already-in-use")l="The account already exists for that email."
+else if(m.c==="invalid-email")l="Invalid Email address"
 else{h=m.b
 l=h==null?"An unknown error occurred. Please try again.":h}throw A.e(A.d1(l))
 s=6
