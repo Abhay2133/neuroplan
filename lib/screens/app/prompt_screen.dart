@@ -45,7 +45,7 @@ class _PromptScreenState extends State<PromptScreen> {
       setState(() {
         isLoadingConfig = true;
       });
-      String? selectedProvider = await aiProviderService.getSelectedProvider();
+      String? selectedProvider = await aiProviderService.getSelectedProvider() ?? "groq";
       if (selectedProvider == null) return _proivderError();
 
       String? apiKey = await aiProviderService.getApiKey(selectedProvider);
