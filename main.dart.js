@@ -88163,7 +88163,7 @@ case 6:case 1:return A.C(q,r)
 case 2:return A.B(o.at(-1),r)}})
 return A.D($async$wC,r)},
 wG(a,b){return this.a_I(a,b)},
-a_I(a,b){var s=0,r=A.E(t.t6),q,p=2,o=[],n,m,l,k,j,i,h
+a_I(a,b){var s=0,r=A.E(t.t6),q,p=2,o=[],n,m,l,k,j,i,h,g
 var $async$wG=A.z(function(c,d){if(c===1){o.push(d)
 s=p}while(true)switch(s){case 0:p=4
 k=$.bl
@@ -88180,13 +88180,13 @@ p=2
 s=6
 break
 case 4:p=3
-h=o.pop()
-m=A.a0(h)
+g=o.pop()
+m=A.a0(g)
 l=""
 if(m instanceof A.tO)if(m.c==="weak-password")l="The password is too weak."
 else if(m.c==="email-already-in-use")l="The account already exists for that email."
-else l="An unknown error occurred. Please try again."
-throw A.e(A.d1(l))
+else{h=m.b
+l=h==null?"An unknown error occurred. Please try again.":h}throw A.e(A.d1(l))
 s=6
 break
 case 3:s=2
