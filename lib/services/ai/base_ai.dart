@@ -11,3 +11,12 @@ class InvalidApiKey implements Exception {
   @override
   String toString() => 'IAK error : $message';
 }
+
+class InvalidApiResponseSyntax implements Exception {
+  final String message;
+  InvalidApiResponseSyntax(this.message);
+
+  @override
+  String toString() => 'IARS error : $message';
+}
+

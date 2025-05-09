@@ -211,7 +211,7 @@ class _AiSettingsState extends State<AiSettings> {
                     child: Row(
                       children: [
                         SizedBox(
-                          width: min(550, constraints.maxWidth),
+                          width: min(550, constraints.maxWidth - 100),
                           child: TextField(controller: _tokenController),
                         ),
                         Gap(8),

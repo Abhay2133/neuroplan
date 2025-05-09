@@ -33,7 +33,13 @@ class Groq extends BaseAi {
       if (response.statusCode == 200) {
         final data = jsonDecode(response.body);
         String content = data["choices"][0]["message"]["content"];
-        return jsonDecode(content);
+        dynamic output;
+        try {
+          output = jsonDecode(content);
+        } catch (e) {
+          throw InvalidApiResponseSyntax("GROQ response having invalid JSON, please try again");
+        }
+        return output;
       } else {
         dlog('HTTP Error: ${response.statusCode}');
         throw Exception(

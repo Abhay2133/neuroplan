@@ -124,7 +124,10 @@ class _PromptScreenState extends State<PromptScreen> {
       // dlog(data);
     } on InvalidApiKey catch (e) {
       _proivderError(e.toString());
-    } catch (e) {
+    } on InvalidApiResponseSyntax catch(e){
+      if(mounted) alert(context, e.toString(), title: "Try Again", copy: true);
+    }
+    catch (e) {
       if (mounted) {
         alert(context, e.toString(), title: "Failed to load results");
       }
@@ -218,7 +221,7 @@ class _PromptScreenState extends State<PromptScreen> {
             Gap(10),
             _input(context),
             Gap(10),
-            _buttonsRow(context),
+            SingleChildScrollView(scrollDirection: Axis.horizontal, child: _buttonsRow(context)),
             Padding(
               padding: const EdgeInsets.all(8.0),
               child: _outputList(context),
@@ -395,8 +398,7 @@ class _PromptScreenState extends State<PromptScreen> {
           children: [
             Row(
               children: [
-                Text(title, style: Theme.of(context).textTheme.headlineSmall),
-                Expanded(child: SizedBox()),
+                Expanded(child: Text(title, style: Theme.of(context).textTheme.headlineSmall),),
                 Text(duration, style: Theme.of(context).textTheme.bodyMedium),
               ],
             ),
