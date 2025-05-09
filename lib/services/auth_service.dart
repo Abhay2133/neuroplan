@@ -41,7 +41,7 @@ class AuthService extends ChangeNotifier {
         } else if (e.code == 'email-already-in-use') {
           errorMessage = 'The account already exists for that email.';
         } else {
-          errorMessage = 'An unknown error occurred. Please try again.';
+          errorMessage = e.message ?? 'An unknown error occurred. Please try again.';
         }
       }
       throw Exception(errorMessage);
